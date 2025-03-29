@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- Sidebar -->
+        <aside class="fixed h-screen w-64 bg-white shadow-lg">
+            <div class="p-4">
+                <h1 class="text-2xl font-bold text-gray-800">Store Manager</h1>
+            </div>
+            <nav class="mt-4">
+                <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600 active:bg-blue-100" onclick="showSection('dashboard')">
+                    <i class="bi bi-grid-1x2-fill mr-2"></i>Dashboard
+                </a>
+                <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600" onclick="showSection('inventory')">
+                    <i class="bi bi-box-seam mr-2"></i>Inventory
+                </a>
+                <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600" onclick="showSection('reports')">
+                    <i class="bi bi-graph-up mr-2"></i>Reports
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="ml-64 p-8">
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-700">Total Revenue</h3>
+                        <p class="text-3xl font-bold text-green-600">$24,500</p>
+                        <span class="text-sm text-gray-500">+12% from last month</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-700">Total Expenses</h3>
+                        <p class="text-3xl font-bold text-red-600">$18,300</p>
+                        <span class="text-sm text-gray-500">-3% from last month</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-700">Net Profit</h3>
+                        <p class="text-3xl font-bold text-blue-600">$6,200</p>
+                        <span class="text-sm text-gray-500">+15% from last month</span>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <canvas id="profitChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Inventory Section -->
+            <section id="inventory" class="hidden">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold">Inventory Management</h2>
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" onclick="addItem()">
+                            Add New Item
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-6 py-3">Item Name</th>
+                                    <th class="px-6 py-3">Quantity</th>
+                                    <th class="px-6 py-3">Price</th>
+                                    <th class="px-6 py-3">Status</th>
+                                    <th class="px-6 py-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTable">
+                                <!-- Data will be populated via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports" class="hidden space-y-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold">Profit & Loss Reports</h2>
+                        <div class="space-x-2">
+                            <button class="px-4 py-2 bg-gray-200 rounded" onclick="changeReportView('daily')">Daily</button>
+                            <button class="px-4 py-2 bg-gray-200 rounded" onclick="changeReportView('weekly')">Weekly</button>
+                            <button class="px-4 py-2 bg-gray-200 rounded" onclick="changeReportView('monthly')">Monthly</button>
+                        </div>
+                    </div>
+                    <canvas id="reportsChart"></canvas>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Charts
+        const profitCtx = document.getElementById('profitChart').getContext('2d');
+        const reportsCtx = document.getElementById('reportsChart').getContext('2d');
+
+        const profitChart = new Chart(profitCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Monthly Profit',
+                    data: [5000, 6200, 7400, 6800, 6200, 8400],
+                    borderColor: 'rgb(59, 130, 246)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Monthly Profit Trend'
+                    }
+                }
+            }
+        });
+
+        const reportsChart = new Chart(reportsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                datasets: [{
+                    label: 'Revenue',
+                    data: [6500, 5900, 6700, 7200],
+                    backgroundColor: 'rgba(59, 130, 246, 0.5)'
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+        // Navigation Functions
+        function showSection(sectionId) {
+            document.querySelectorAll('main section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // Inventory Management
+        let inventory = [];
+
+        function addItem() {
+            const item = {
+                name: prompt('Enter item name:'),
+                quantity: parseInt(prompt('Enter quantity:')),
+                price: parseFloat(prompt('Enter price:')),
+                status: 'In Stock'
+            };
+            if (item.name && item.quantity && item.price) {
+                inventory.push(item);
+                updateInventoryTable();
+            }
+        }
+
+        function updateInventoryTable() {
+            const table = document.getElementById('inventoryTable');
+            table.innerHTML = inventory.map(item => `
+                <tr class="border-t">
+                    <td class="px-6 py-4">${item.name}</td>
+                    <td class="px-6 py-4">${item.quantity}</td>
+                    <td class="px-6 py-4">$${item.price.toFixed(2)}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                            ${item.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button class="text-blue-600 hover:text-blue-800 mr-2">Edit</button>
+                        <button class="text-red-600 hover:text-red-800">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Reports Functions
+        function changeReportView(period) {
+            let labels, data;
+            switch(period) {
+                case 'daily':
+                    labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    data = [1200, 1400, 1100, 1600, 1300, 1700, 1500];
+                    break;
+                case 'weekly':
+                    labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                    data = [6500, 5900, 6700, 7200];
+                    break;
+                case 'monthly':
+                    labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+                    data = [25000, 27000, 23000, 28000, 26000, 29000];
+                    break;
+            }
+            reportsChart.data.labels = labels;
+            reportsChart.data.datasets[0].data = data;
+            reportsChart.update();
+        }
+
+        // Initialize
+        showSection('dashboard');
+        updateInventoryTable();
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
